@@ -1,3 +1,6 @@
+CREATE DATABASE kafka_transactions;
+\c kafka_transactions;
+
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     amount DECIMAL NOT NULL CHECK (amount >= 0)

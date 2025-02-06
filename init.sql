@@ -1,3 +1,5 @@
+CREATE DATABASE "user";
+
 CREATE DATABASE kafka_transactions;
 \c kafka_transactions;
 
@@ -13,7 +15,7 @@ CREATE TABLE transactions (
     sender_id UUID NOT NULL,
     receiver_id UUID NOT NULL,
     transaction_type VARCHAR(20) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES users(id),
@@ -27,13 +29,13 @@ BEGIN
     SELECT amount INTO sender_balance FROM users WHERE id = NEW.sender_id;
 
     IF sender_balance < NEW.amount THEN
-        UPDATE transactions SET status = 'failed', updated_at = NOW() WHERE transaction_id = NEW.transaction_id;
+        UPDATE transactions SET status = 'FAILED', updated_at = NOW() WHERE transaction_id = NEW.transaction_id;
         RETURN NEW;
     END IF;
 
     UPDATE users SET amount = amount - NEW.amount WHERE id = NEW.sender_id;
     UPDATE users SET amount = amount + NEW.amount WHERE id = NEW.receiver_id;
-    UPDATE transactions SET status = 'completed', updated_at = NOW() WHERE transaction_id = NEW.transaction_id;
+    UPDATE transactions SET status = 'SUCCESS', updated_at = NOW() WHERE transaction_id = NEW.transaction_id;
 
     RETURN NEW;
 END;
